@@ -3,6 +3,9 @@ const init = function(){
     document.getElementById("new-course-button").addEventListener('click', NewCourseButton);
 }
 
+let CourseObject = {};
+const thisCourse = Object.create(CourseObject);
+
 const NewCourseButton = function Creation(CourseName, NumberOfExams) { 
 
 CourseName = document.getElementById('new-course-name').value;
@@ -78,19 +81,14 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
     btn.appendChild(document.createTextNode(`${CourseName}`));
     (document.getElementById(`course-list-for-${CourseName}`)).appendChild(btn);
 
-    //Creando el objeto
-    const CourseObject = {
-        name:CourseName,
-        number_of_exams:NumberOfExams,
-        course_array:examsarray,
-        each_evaluation_value:percentages_array,
-        calculator:btn,       
-    }
-
-    const thisCourse = Object.create(CourseObject);
-    
+    //Actualizando el objeto
+    CourseObject.name=CourseName;
+    CourseObject.number_of_exams=NumberOfExams;
+    CourseObject.course_array=examsarray;
+    CourseObject.each_evaluation_value=percentages_array;
+    CourseObject.calculator=btn;
+       
     //Aquí empezará la calculadora
-
     let each_exam_grade = [];
     
     document.getElementById(`${CourseName}-calculator`.toLocaleLowerCase()).onclick = function(){
@@ -139,7 +137,6 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         (document.getElementById(`course-list-for-${CourseName}`)).appendChild(disabled_p);
         //CourseObject.calculator.className = "text-secondary";
 
-        function CreateFinalParagrpah () {
         let DisplayCourseNote = document.createElement("p");
         DisplayCourseNote.id = `${CourseObject.name}-grade-paragraph`
         DisplayCourseNote.appendChild(document.createTextNode(`La nota del curso de ${CourseObject.name} es ${CourseObject.final_grade}`));
@@ -148,14 +145,24 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         CourseObject.final_paragraph = DisplayCourseNote.textContent;
 
         console.log(CourseObject.final_paragraph);
-        }
-        //Almacenamiento local
+        
+        //Almacenamiento local 
+        localStorage.setItem(CourseObject.name, JSON.stringify(CourseObject.final_paragraph));        
+    }   
+}
+}
+    //Carga las notas del párrafo final solo si hay elementos en localstorage
+    window.addEventListener('DOMContentLoaded',() => {
+        for (let i = 0; i < localStorage.length; i++){
+            let key = localStorage.key(i);
+            let item = JSON.parse(localStorage.getItem(key));
 
-
+            let RestoredDisplayCourseNote = document.createElement('p');
+            RestoredDisplayCourseNote.textContent = item;
+            (document.getElementById('third-column')).appendChild(RestoredDisplayCourseNote);
+        } 
     }
-    
-}
-}
+)
 
 
 document.addEventListener('DOMContentLoaded', init)
