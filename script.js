@@ -49,16 +49,11 @@ SetAndHide.style = 'margin-left:10px';
 //Función tras activar el botón de almacenar datos
 document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
 
-    //Activando los input nuevamente
-    document.getElementById("new-course-button").disabled = false;
-    document.getElementById("new-course-name").disabled = false;
-    document.getElementById('number-of-exams').disabled = false;
-
     //Guardando los porcentajes de los input en un array
     let percentage_input = document.getElementsByClassName(`percentages-to-set-${CourseName}`);
     let percentages_array = [];
     for (let i of percentage_input) {
-        percentages_array.push(parseInt(i.value))
+        percentages_array.push(parseInt(i.value));
     }
     
     //Desapareciendo los input y el botón tras guardar data
@@ -92,20 +87,58 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
     let each_exam_grade = [];
     
     document.getElementById(`${CourseName}-calculator`.toLocaleLowerCase()).onclick = function(){
+        //Desapareciendo momentaneamente el <ul> de la secund-column
+        var ul_to_hide = document.getElementById('courses-ul');
+        ul_to_hide.style.display = 'none';
+
+        //Creando nuevos <ul>
+        const ul_inputs = document.createElement('ul');
+        ul_inputs.id = `${CourseName}-input-ul`;
+        ul_inputs.className = 'list-group list-group-flush';
+        (document.getElementById('second-column')).appendChild(ul_inputs);
 
         //Primer bucle : asignar un porcentaje a cada evaluación
         (CourseObject.course_array).forEach((evaluation,value) => {
-            const percentage_value = CourseObject.each_evaluation_value[value];
-            
-            //Prompt por cada evaluación y almacenar la nota en un array
-            let grade = 0;
-            do{
-                grade = parseFloat(prompt(`Ingresa tu nota en la ${evaluation} del curso de ${CourseObject.name} \n (Valor del ${percentage_value}% sobre la nota final)`));
-            } while (grade > 10 || grade < 0);
-            each_exam_grade.push(grade);
+            const percentage_value = CourseObject.each_evaluation_value[value]; 
+
+            //Creando los nuevo <li> <input> que serán insertados en el <ul> de la second-column
+            const li_inputs = document.createElement('li');
+            li_inputs.id = ((`${evaluation}-of-${CourseName}-input-li`.replace(/°/g, "")).replace(/ /g, "")).toLocaleLowerCase();
+            li_inputs.className = "list-group-item";
+            (document.getElementById(`${CourseName}-input-ul`).appendChild(li_inputs));
+
+            const text_input = document.createElement('input');
+            text_input.type = 'text';
+            text_input.placeholder = `Nota de ${evaluation} (${percentage_value}%)`;
+            text_input.id = ((`${evaluation}-of-${CourseName}-input-text`.replace(/°/g, "")).replace(/ /g, "")).toLocaleLowerCase();
+            text_input.className = 'form-control grade-input';
+            (document.getElementById(((`${evaluation}-of-${CourseName}-input-li`.replace(/°/g, "")).replace(/ /g, "")).toLocaleLowerCase())).appendChild(text_input);
 
         }
         )
+
+        //Botón para enviar data
+        const SendAndShow = document.createElement('button');
+        SendAndShow.textContent = 'Calcular';
+        SendAndShow.id = 'send-and-show-button';
+        SendAndShow.className = 'btn btn-dark';
+        document.getElementById('second-column').appendChild(SendAndShow);
+
+        //Iniciando el evento del botón
+        document.getElementById('send-and-show-button').onclick = function() {
+
+            //Looping a través de los input y guardándolos el valor en un array
+            const entered_grades = document.getElementsByClassName('grade-input');
+            for (let i of entered_grades){
+                const the_grade = i.value;
+                each_exam_grade.push(the_grade);
+            }
+            console.log(each_exam_grade);
+
+            //Removemos el <ul> que contiene los <li> e <input> y volvemos a mostrar el primer <ul>
+            document.getElementById(`${CourseName}-input-ul`).remove();
+            document.getElementById('send-and-show-button').remove();
+            ul_to_hide.style.display = 'block';
 
         //Actualizamos objeto con las notas de cada evaluación 
         CourseObject.each_grade = each_exam_grade;
@@ -142,26 +175,48 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         DisplayCourseNote.appendChild(document.createTextNode(`La nota del curso de ${CourseObject.name} es ${CourseObject.final_grade}`));
         (document.getElementById('third-column')).appendChild(DisplayCourseNote);
 
+        //Actualizando el objeto con la nota final
         CourseObject.final_paragraph = DisplayCourseNote.textContent;
 
         console.log(CourseObject.final_paragraph);
         
         //Almacenamiento local 
-        localStorage.setItem(CourseObject.name, JSON.stringify(CourseObject.final_paragraph));        
+        localStorage.setItem(CourseObject.name, JSON.stringify(CourseObject.final_paragraph));
+        
+        //Activando los input nuevamente
+        document.getElementById("new-course-button").disabled = false;
+        document.getElementById("new-course-name").disabled = false;
+        document.getElementById('number-of-exams').disabled = false;      
+        }      
     }   
 }
 }
-    //Carga las notas del párrafo final solo si hay elementos en localstorage
-    window.addEventListener('DOMContentLoaded',() => {
-        for (let i = 0; i < localStorage.length; i++){
-            let key = localStorage.key(i);
-            let item = JSON.parse(localStorage.getItem(key));
+//Carga las notas del párrafo final solo si hay elementos en localstorage
+window.addEventListener('DOMContentLoaded',() => {
 
-            let RestoredDisplayCourseNote = document.createElement('p');
-            RestoredDisplayCourseNote.textContent = item;
-            (document.getElementById('third-column')).appendChild(RestoredDisplayCourseNote);
-        } 
+    for (let i = 0; i < localStorage.length; i++){
+        let key = localStorage.key(i);
+        let item = JSON.parse(localStorage.getItem(key));
+
+        let RestoredDisplayCourseNote = document.createElement('p');
+        RestoredDisplayCourseNote.textContent = item;
+        (document.getElementById('third-column')).appendChild(RestoredDisplayCourseNote);
+    } 
+
+    //Mostrar un botton de reset si hay elementos en localStorage
+    if(localStorage.length>0){
+        const ResetData = document.createElement('button');
+        ResetData.id = 'reset-grades-button';
+        ResetData.className = 'btn btn-dark';
+        ResetData.textContent = 'Resetear';
+        (document.getElementById('third-column')).appendChild(ResetData);
+
+        document.getElementById('reset-grades-button').onclick = function() {
+            localStorage.clear();
+            document.location.reload();
+        }
     }
+}
 )
 
 
