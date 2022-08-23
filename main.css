@@ -18,14 +18,28 @@ body{
     margin: 10px;
 }
 
+
+/*Ajustes de diseño a los inputs*/
 input{
     width: 275px;
 }
 
-button#test-button{
-    margin-top: auto;
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    
+    -webkit-appearance: none;
+    margin: 0;
 }
 
+input::-webkit-input-placeholder {
+    font-size: 15px;
+    line-height: 4;
+}
+
+/*Ajustes del canvas en Charts JS*/
+.chart-container{
+    height: 435px;
+}
 
 
 
