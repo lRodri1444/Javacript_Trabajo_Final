@@ -222,8 +222,21 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         grades_deserialized.push(...all_grades);
         localStorage.setItem('grades-serialized', JSON.stringify(grades_deserialized));
 
+        //Activando los input nuevamente
+        document.getElementById("new-course-button").disabled = false;
+        document.getElementById("new-course-name").disabled = false;
+        document.getElementById('number-of-exams').disabled = false; 
+
         //Ejecución de Charts JS 
         document.getElementById('display-chart').onclick = function() {
+
+            //Desactivando todos los botones e inputs
+            document.getElementById("new-course-button").disabled = true;
+            document.getElementById("new-course-name").disabled = true;
+            document.getElementById('number-of-exams').disabled = true;
+            document.getElementById('display-chart').disabled = true;
+
+            //Contenedores para el chart
             const ChartDiv = document.createElement('div');
             ChartDiv.id = 'chart-div';
             ChartDiv.className = 'chart-container';
@@ -236,9 +249,10 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             //Asignando color a las barras
             const BarColor = [];
             for (let i = 0; i < all_grades.length; i++) {
-                all_grades[i] < 6 ? BarColor.push('#ff6961') : BarColor.push('#85de77'); // rojo : verde
+                all_grades[i] < 6 ? BarColor.push('rgb(255,105,97)') : BarColor.push('rgb(133,222,119)'); // rojo : verde
             }
 
+            //Chart
             let myChart = (document.getElementById('myChart')).getContext('2d');
             
             let gradesChart = new Chart(myChart,{
@@ -265,12 +279,37 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
                     }
                 }
             })
-        }
-        
-        //Activando los input nuevamente
-        document.getElementById("new-course-button").disabled = false;
-        document.getElementById("new-course-name").disabled = false;
-        document.getElementById('number-of-exams').disabled = false;    
+
+            //Quickchart API
+            //API que transforma el gráfico en un link, lo usaremos para crear un botón de descarga
+            const all_courses_serialized = JSON.stringify(all_courses);
+            const BarColor_serialized = JSON.stringify(BarColor);
+
+            const GraphUrl = encodeURI(`https://quickchart.io/chart?c={type:'horizontalBar',data:{labels:${all_courses_serialized},datasets:[{label:'Resultados del bimestre',data:[${all_grades}],backgroundColor:${BarColor_serialized}}]},options:{scales:{xAxes:[{ticks:{min:0,max:10,}}]}}}`);
+ 
+            (async () => {
+                //Fetch
+                const response = await fetch(GraphUrl)
+                const imageBlob = await response.blob()
+                const reader = new FileReader();
+                reader.readAsDataURL(imageBlob);
+                reader.onloadend = () => {
+                  const base64data = reader.result;
+                    
+                  //Creando el botón y el link para descargar
+                  const imgDownload = document.createElement('a');
+                  imgDownload.id = 'results-to-download'
+                  imgDownload.href = base64data;
+                  imgDownload.download = 'resultados_del_bimestre.png';
+                  document.getElementById('third-column').appendChild(imgDownload);
+
+                  const base64_img = document.createElement('button');
+                  base64_img.textContent = 'Descargar';
+                  base64_img.className = 'btn btn-success';
+                  document.getElementById('results-to-download').appendChild(base64_img);
+                }
+              })();
+        }   
         }       
     }   
 }
