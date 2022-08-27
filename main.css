@@ -40,5 +40,9 @@ input::-webkit-input-placeholder {
     height: 435px;
 }
 
-
+/*Diseño de las alertas de validación*/
+div#validation-error{
+    margin-right: -20px;
+    margin-top: 10px;
+}
 
