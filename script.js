@@ -2,6 +2,10 @@
 const init = function(){
     document.getElementById("new-course-button").addEventListener('click', NewCourseButton);
 }
+//Columnas
+const FirstColumn = document.getElementById('first-column');
+const SecondColumn = document.getElementById('second-column');
+const ThirdColumn = document.getElementById('third-column');
 
 //Objeto del curso
 let CourseObject = {};
@@ -39,7 +43,13 @@ let ValidationErrorMsg = (function(ErrorText, column){
     document.getElementById('alert-dismissal').appendChild(AlertSpan);
 })
 
-//DisplayChartF (Será llamada en Ln 306 y solo se activará una vez)
+//Mensajes de error
+const PercentagesErrorText = 'Algo salió mal, recuerda:\n• Solo puedes ingresar porcentajes entre 0 y 100 \n• La suma de tus porcentajes debe ser 100';
+const PercentagesSumErrorText = `Algo salió mal, recuerda:\n• Solo puedes ingresar porcentajes entre 0 y 100 \n• La suma de tus porcentajes debe ser 100`;
+const GradesErrorText = 'Algo salió mal, recuerda:\n• Solo puedes ingresar notas entre 0 y 10\n• No dejes campos en blanco';
+const EmptyErrorText = 'Algo salió mal, recuerda:\n• Solo puedes ingresar notas entre 0 y 10\n• No dejes campos en blanco';
+
+//DisplayChartF (Será llamada en Ln 316 y solo se activará una vez)
 var is_displayed = false;
 let DisplayChartF = (function(){
         if (!is_displayed){
@@ -48,7 +58,7 @@ let DisplayChartF = (function(){
             DisplayChart.id = 'display-chart';
             DisplayChart.className = 'btn btn-dark';
             DisplayChart.textContent = 'Mostrar resultados';
-            (document.getElementById('second-column')).appendChild(DisplayChart);
+            SecondColumn.appendChild(DisplayChart);
         }
 })
 
@@ -81,7 +91,7 @@ examsarray.forEach(function (ExamValue) {
     ntp.id = ((`${ExamValue}-of-${CourseName}`.replace(/°/g, "")).replace(/ /g, "")).toLocaleLowerCase();
     ntp.className = `form-control percentages-to-set-${CourseName}`;
     ntp.style = 'margin-left:10px';
-    document.getElementById('first-column').appendChild(ntp)
+    FirstColumn.appendChild(ntp)
 })
 
 //Botón para almacenar los datos
@@ -91,7 +101,7 @@ SetAndHide.value = 'Establecer porcentajes';
 SetAndHide.id = `set-and-hide-${CourseName}`;
 SetAndHide.className = 'btn btn-dark';
 SetAndHide.style = 'margin-left:10px';
-(document.getElementById('first-column')).appendChild(SetAndHide);
+FirstColumn.appendChild(SetAndHide);
 
 //Función tras activar el botón de almacenar datos
 document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
@@ -113,9 +123,6 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
     //Validando
     for (let i of percentages_array){
         if (i < 0 || i > 100){
-            const PercentagesErrorText = 'Algo salió mal, recuerda:\n• Solo puedes ingresar porcentajes entre 0 y 100 \n• La suma de tus porcentajes debe ser 100';
-            const FirstColumn = document.getElementById('first-column');
-    
             PercentagesValidator = false;
             percentages_array = [];            
             if (!document.getElementById('validation-error')){
@@ -130,10 +137,9 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         }
     }
 
+    //Solo permite la segunda validación si la primera se cumple
+    if (PercentagesValidator === true){
     if (percentages_sum != 100){
-        const PercentagesSumErrorText = `Algo salió mal, recuerda:\n• Solo puedes ingresar porcentajes entre 0 y 100 \n• La suma de tus porcentajes debe ser 100`;
-        const FirstColumn = document.getElementById('first-column');
-
         PercentagesValidator = false;
         percentages_array = [];
         if (!document.getElementById('validation-error')){
@@ -144,8 +150,8 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         PercentagesValidator = true;
     }
 
-    //Desapareciendo los input y el botón tras guardar data
     if (PercentagesValidator === true){
+    //Desapareciendo los input y el botón tras guardar data
     const percentages = document.getElementsByClassName(`percentages-to-set-${CourseName}`);
     for (let i of percentages) {
         i.style.display = 'none';
@@ -189,7 +195,7 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         var ul_to_hide = document.getElementById('courses-ul');
         ul_to_hide.style.display = 'none';
         var btn_to_hide = document.getElementById('display-chart');
-        if (document.getElementById('second-column').contains(btn_to_hide)){
+        if (SecondColumn.contains(btn_to_hide)){
             btn_to_hide.style.display = 'none';
         }
         
@@ -197,7 +203,7 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         const ul_inputs = document.createElement('ul');
         ul_inputs.id = `${CourseName}-input-ul`;
         ul_inputs.className = 'list-group list-group-flush';
-        (document.getElementById('second-column')).appendChild(ul_inputs);
+        SecondColumn.appendChild(ul_inputs);
 
             //Primer bucle : asignar un porcentaje a cada evaluación
             (theCourseCourseArray).forEach((evaluation,value) => {
@@ -224,7 +230,7 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             SendAndShow.textContent = 'Calcular';
             SendAndShow.id = 'send-and-show-button';
             SendAndShow.className = 'btn btn-dark';
-            document.getElementById('second-column').appendChild(SendAndShow);
+            SecondColumn.appendChild(SendAndShow);
 
             //Iniciando el evento para calcular notas
             document.getElementById('send-and-show-button').onclick = function() {
@@ -241,13 +247,17 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             //Validando las notas
             for (let i of each_exam_grade){
                 if (i < 0 || i > 10){
-                    const GradesErrorText = 'Solo puedes ingresar notas entre 0 y 10';
-                    const ThirdColumn = document.getElementById('third-column');
-
                     GradesValidator = false;
                     each_exam_grade = [];
                     if (!document.getElementById('validation-error')){
                         ValidationErrorMsg(GradesErrorText, ThirdColumn);
+                    }
+                    break;
+                } else if(i == ''){
+                    GradesValidator = false;
+                    each_exam_grade = [];
+                    if (!document.getElementById('validation-error')){
+                        ValidationErrorMsg(EmptyErrorText, ThirdColumn);
                     }
                     break;
                 } else{
@@ -263,7 +273,7 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             document.getElementById(`${CourseName}-input-ul`).remove();
             document.getElementById('send-and-show-button').remove();
             ul_to_hide.style.display = 'block';
-            if (document.getElementById('second-column').contains(btn_to_hide)){
+            if (SecondColumn.contains(btn_to_hide)){
                 btn_to_hide.style.display = 'block';
             }
 
@@ -302,7 +312,7 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             all_courses.push(theCourseName);
             all_grades.push(theCourseFinalGrade);
 
-            //Llamando a DisplayChartF (Ln 44)
+            //Llamando a DisplayChartF (Ln 54)
             DisplayChartF();
 
             //Almacenamiento local
@@ -323,6 +333,21 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
 
         //Ejecución de Charts JS 
         document.getElementById('display-chart').onclick = function() {
+            //Listando aprobados y desaprobados
+            let approved_courses = [];
+            let disapproved_courses = [];
+            for (let i of all_grades){
+                i < 6 ? disapproved_courses.push(i) : approved_courses.push(i);
+            }
+
+            const ApprovedHeader = document.getElementById('approved-courses');
+            const DisapprovedHeader = document.getElementById('disapproved-courses');
+
+            ApprovedHeader.textContent = `Cursos aprobados : ${approved_courses.length}`;
+            DisapprovedHeader.textContent = `Cursos desaprobados : ${disapproved_courses.length}`;
+
+            localStorage.setItem('approved-serialized',JSON.stringify(ApprovedHeader.textContent));
+            localStorage.setItem('disapproved-serialized',JSON.stringify(DisapprovedHeader.textContent));
 
             //Desactivando todos los botones e inputs
             document.getElementById("new-course-button").disabled = true;
@@ -334,7 +359,7 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             const ChartDiv = document.createElement('div');
             ChartDiv.id = 'chart-div';
             ChartDiv.className = 'chart-container';
-            (document.getElementById('third-column')).appendChild(ChartDiv);
+            (document.getElementById('chart-card')).appendChild(ChartDiv);
 
             const ChartCanvas = document.createElement("canvas");
             ChartCanvas.id = 'myChart';
@@ -364,6 +389,13 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
                     maintainAspectRatio: false,
                     indexAxis:'y',
                     scales:{
+                        x:{
+                            min:0,
+                            max:10,
+                            ticks:{
+                                stepSize:1
+                            }
+                        },
                         y:{
                             grid:{
                                 offset: false,
@@ -372,7 +404,19 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
                         }
                     }
                 }
-            })
+            });
+            
+            //Botón de reseteo
+            const ResetData = document.createElement('button');
+            ResetData.id = 'reset-grades-button';
+            ResetData.className = 'btn btn-dark';
+            ResetData.textContent = 'Resetear';
+            (document.getElementById('chart-card')).appendChild(ResetData);
+
+            document.getElementById('reset-grades-button').onclick = function() {
+                localStorage.clear();
+                document.location.reload();
+            }
 
             //Quickchart API
             //API que transforma el gráfico en un link, lo usaremos para crear un botón de descarga
@@ -389,13 +433,14 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
                 reader.readAsDataURL(imageBlob);
                 reader.onloadend = () => {
                   const base64data = reader.result;
+                  localStorage.setItem('download-serialized', JSON.stringify(base64data));
                     
                   //Creando el botón y el link para descargar
                   const imgDownload = document.createElement('a');
                   imgDownload.id = 'results-to-download'
                   imgDownload.href = base64data;
                   imgDownload.download = 'resultados_del_bimestre.png';
-                  document.getElementById('third-column').appendChild(imgDownload);
+                  document.getElementById('chart-card').appendChild(imgDownload);
 
                   const base64_img = document.createElement('button');
                   base64_img.textContent = 'Descargar';
@@ -407,21 +452,44 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
         }   
         }       
     }
+}
 }   
 }
 }
+
 //Carga el DOM
 window.addEventListener('DOMContentLoaded',() => {
-    
-    //Si hay data en localStorage, recupera el chart
+    //Si hay data en localStorage...
     if(localStorage.length>0){
+        document.getElementById("new-course-button").disabled = true;
+        document.getElementById("new-course-name").disabled = true;
+        document.getElementById('number-of-exams').disabled = true;
+
+        //Activa un toast
+        const ToastAlert = document.getElementById('graph-alert');
+        ToastAlert.style.display = 'block';
+        $(document).ready(function(){
+            $('.toast').toast('show');
+        })
+
+        //Recupera el listado de aprobados y desaprovados
+        let ApprovedDeserialized = JSON.parse(localStorage.getItem('approved-serialized'));
+        let DisapprovedDeserialized = JSON.parse(localStorage.getItem('disapproved-serialized'));
+
+        let RestoredApproved = document.getElementById('approved-courses');
+        let RestoredDisapproved = document.getElementById('disapproved-courses');
+
+        RestoredApproved.textContent = ApprovedDeserialized;
+        RestoredDisapproved.textContent = DisapprovedDeserialized;
+
+        //Recupera el chart
         let gradesChart_labels = JSON.parse(localStorage.getItem('courses-serialized'));
         let gradesChart_dataset = JSON.parse(localStorage.getItem('grades-serialized'));
 
         const RestoredChartDiv = document.createElement('div');
         RestoredChartDiv.id = 'restored-chart-div';
         RestoredChartDiv.className = 'chart-container';
-        (document.getElementById('third-column')).appendChild(RestoredChartDiv);
+        (document.getElementById('chart-card')).appendChild(RestoredChartDiv);
 
         const RestoredChartCanvas = document.createElement("canvas");
         RestoredChartCanvas.id = 'myChart';
@@ -449,6 +517,13 @@ window.addEventListener('DOMContentLoaded',() => {
                 maintainAspectRatio: false,
                 indexAxis:'y',
                 scales:{
+                    x:{
+                        min:0,
+                        max:10,
+                        ticks:{
+                            stepSize:1
+                        }
+                    },
                     y:{
                         grid:{
                             offset: false,
@@ -459,17 +534,31 @@ window.addEventListener('DOMContentLoaded',() => {
             }
         })
 
-        //Crea un botón de reseteo
-        const ResetData = document.createElement('button');
-        ResetData.id = 'reset-grades-button';
-        ResetData.className = 'btn btn-dark';
-        ResetData.textContent = 'Resetear';
-        (document.getElementById('third-column')).appendChild(ResetData);
+        //Recupera el botón de reseteo
+        const RestoredResetData = document.createElement('button');
+        RestoredResetData.id = 'reset-grades-button';
+        RestoredResetData.className = 'btn btn-dark';
+        RestoredResetData.textContent = 'Resetear';
+        (document.getElementById('chart-card')).appendChild(RestoredResetData);
 
         document.getElementById('reset-grades-button').onclick = function() {
             localStorage.clear();
             document.location.reload();
         }
+
+        //Recupera el link de descarga
+        let DownloadDeserialized = JSON.parse(localStorage.getItem('download-serialized'));        
+
+        const RestoredimgDownload = document.createElement('a');
+        RestoredimgDownload.id = 'results-to-download'
+        RestoredimgDownload.href = DownloadDeserialized;
+        RestoredimgDownload.download = 'resultados_del_bimestre.png';
+        document.getElementById('chart-card').appendChild(RestoredimgDownload);
+
+        const restored_base64_img = document.createElement('button');
+        restored_base64_img.textContent = 'Descargar';
+        restored_base64_img.className = 'btn btn-success';
+        document.getElementById('results-to-download').appendChild(restored_base64_img);
     }   
 }
 )

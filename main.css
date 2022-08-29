@@ -1,9 +1,8 @@
-/*Estructura general (BG cambiará)*/
+/*Estructura general*/
 body{
     margin: 0;
     padding: 0;
-    background-color: #74EBD5;
-    background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);
+    background-image: url(https://thumbs.dreamstime.com/b/calculator-pen-table-calendar-blue-background-top-view-office-desk-copy-space-179944470.jpg)
 }
 
 /*Diseño de las columnas*/
@@ -40,9 +39,24 @@ input::-webkit-input-placeholder {
     height: 435px;
 }
 
-/*Diseño de las alertas de validación*/
+/*Diseño de las alertas*/
 div#validation-error{
-    margin-right: -20px;
+    margin-right: -15px;
     margin-top: 10px;
 }
 
+
+/*Botones de acción del Chart*/
+
+a#results-to-download{
+    float: right;
+    width: 96px;
+    margin-left: 160px;
+    margin-top: -38px;
+}
+
+button#reset-grades-button{
+    float: left;
+    width: 87px;
+    margin-left: 25px;
+}
