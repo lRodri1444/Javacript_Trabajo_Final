@@ -18,8 +18,9 @@ body{
 }
 
 /*Ajustes de diseño a los inputs*/
-input{
-    width: 275px;
+input.first-column-button{
+    width: 280px;
+    margin-right: 50px;
 }
 
 input::-webkit-outer-spin-button,
@@ -34,6 +35,16 @@ input::-webkit-input-placeholder {
     line-height: 4;
 }
 
+input#new-course-name{
+    width: 82%;
+}
+
+select#number-of-exams{
+    width:50px;
+    float:right;
+    margin-top: -37.7px;
+}
+
 /*Ajustes del canvas en Charts JS*/
 .chart-container{
     height: 435px;
@@ -45,9 +56,7 @@ div#validation-error{
     margin-top: 10px;
 }
 
-
 /*Botones de acción del Chart*/
-
 a#results-to-download{
     float: right;
     width: 96px;
@@ -59,4 +68,24 @@ button#reset-grades-button{
     float: left;
     width: 87px;
     margin-left: 25px;
+}
+
+/*FAQ*/
+img.faq{
+    width: 5%;
+    z-index: 1;
+    float: right;
+}
+
+img#first-column-FAQ{
+    margin-top: -63px;
+}
+
+img#first-column-FAQ-two{
+    margin-bottom: -53px;
+}
+
+img#second-column-FAQ, img#third-column-FAQ{
+    margin-right: -21px;
+    margin-top: -13px;
 }

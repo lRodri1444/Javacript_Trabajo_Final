@@ -13,20 +13,24 @@
     <div id="container">
         <!--Primera columna : Cursos y porcentajes-->
         <div id="first-column" class="col11">
-          <input type="text" id="new-course-name" placeholder="Nombre del curso" style="width:85%;">
+          <input type="text" id="new-course-name" class="form-control" placeholder="Nombre del curso">
           
-          <select name="exams" id="number-of-exams">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          </select> <br> <br>
+          <select name="exams" id="number-of-exams" class="custom-select">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+          </select> <br> 
+
+          <img id="first-column-FAQ" class="faq rounded-circle" src="images/FAQicon.png" title="Ingresa el nombre del&#013curso y selecciona la&#013cantidad de exámenes">
           
-          <input type="button" value="Añade un nuevo curso" id="new-course-button" class="btn btn-dark"> <br><br>
+          <input type="button" value="Añade un nuevo curso" id="new-course-button" class="btn btn-dark first-column-button"> <br><br>
+
+          <!--Bootstrap Toast : Se activará si hay data en localStorage-->
           <div id="graph-alert" role="alert" aria-live="assertive" aria-atomic="true" class="toast bg-warning" data-autohide="false" style="display:none">
             <div class="toast-header bg-warning">
               <strong class="mr-auto">Se reestableció un gráfico</strong>
@@ -38,23 +42,25 @@
               Si quieres reiniciar la calculadora, clickea en el botón <strong>Resetear</strong> bajo el gráfico
             </div>
           </div>
-
         </div>
+
         <!--Segunda columna : Calculadoras-->
         <div id="second-column" class="col12 card">
           <div class="card-header">
+            <img id="second-column-FAQ" class="faq rounded-circle" src="images/FAQicon.png" title="Aquí se añadirán tus cursos, puedes&#013ingresar números entre el 0 y 10.&#013Usa punto (.) para digitar decimales.">
             Tus cursos
           </div>
           <ul id="courses-ul" class="list-group list-group-flush">
-            <li class="list-group-item" style="transform: rotate(0);">              
-              <a href="#" class="text-warning stretched-link">Los cursos añadidos irán acá ↓</a>
-            </li>
           </ul>
         </div>
+
         <!--Tercera columna : Chart-->
         <div id="third-column" class="col13">
           <div id="chart-card" class="card bg-light">
-            <div class="card-header">Tus resultados</div>
+            <div class="card-header">
+              <img id="third-column-FAQ" class="faq rounded-circle" src="images/FAQicon.png" title="Cuando termines de calcular&#013te mostraremos un gráfico con&#013todo tu desempeño académico.&#013También podrás descargarlo.">
+              Tus resultados
+            </div>
             <div class="card-body">
               <h6 id="approved-courses" class="card-title" style="color:rgb(133,222,119);"></h6>
               <h6 id="disapproved-courses" class="card-title" style="color:rgb(255,105,97);"></h6>
@@ -62,6 +68,8 @@
           </div>
         </div>
     </div>
+
+<!--Librerías : Charts JS / JQuery / Bootstrap-->
 <script src="script.js" ></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

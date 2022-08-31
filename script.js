@@ -48,8 +48,10 @@ const PercentagesErrorText = 'Algo salió mal, recuerda:\n• Solo puedes ingres
 const PercentagesSumErrorText = `Algo salió mal, recuerda:\n• Solo puedes ingresar porcentajes entre 0 y 100 \n• La suma de tus porcentajes debe ser 100`;
 const GradesErrorText = 'Algo salió mal, recuerda:\n• Solo puedes ingresar notas entre 0 y 10\n• No dejes campos en blanco';
 const EmptyErrorText = 'Algo salió mal, recuerda:\n• Solo puedes ingresar notas entre 0 y 10\n• No dejes campos en blanco';
+const UniqueErrorText = 'Algo salió mal, recuerda:\n• El nombre del curso no puede estar vacío\n• No puedes repetir nombres de cursos';
+const RequiredCourseErrorText = 'Algo salió mal, recuerda:\n• El nombre del curso no puede estar vacío\n• No puedes repetir nombres de cursos'
 
-//DisplayChartF (Será llamada en Ln 316 y solo se activará una vez)
+//DisplayChartF (Será llamada en Ln 374 y solo se activará una vez)
 var is_displayed = false;
 let DisplayChartF = (function(){
         if (!is_displayed){
@@ -63,18 +65,71 @@ let DisplayChartF = (function(){
 })
 
 //Función principal
-const NewCourseButton = function Creation(CourseName, NumberOfExams) { 
+const NewCourseButton = function Creation(CourseName, NumberOfExams) {
 
 CourseName = document.getElementById('new-course-name').value;
 NumberOfExams = parseInt(document.getElementById('number-of-exams').value);
 
-//Desactivando los input momentaneamente y reseteando su valor
+//Tokens de validación
+let UniqueCourseValidator = false;
+let RequiredCourseValidator = false;
+
+//Validación
+if (all_courses.length > 0){
+    for (let i of all_courses){
+        if (i == CourseName || i.toLocaleLowerCase() == CourseName.toLocaleLowerCase()){
+            UniqueCourseValidator = false;
+            if(!document.getElementById('validation-error')){
+                ValidationErrorMsg(UniqueErrorText, FirstColumn);
+            }
+            break;
+        }else{
+            if(document.getElementById('validation-error')){
+                document.getElementById('validation-error').remove();
+            }
+            UniqueCourseValidator = true;
+        }
+    }
+    if(UniqueCourseValidator === true){
+        if (CourseName == ''){
+            RequiredCourseValidator = false;
+            if (!document.getElementById('validation-error')){
+                ValidationErrorMsg(RequiredCourseErrorText, FirstColumn);
+            }
+        } else{
+            RequiredCourseValidator = true;
+            if(document.getElementById('validation-error')){
+                document.getElementById('validation-error').remove();
+            }
+        }
+    }
+} else if (all_courses.length == 0){
+    if (CourseName == ''){
+        RequiredCourseValidator = false;
+        if (!document.getElementById('validation-error')){
+            ValidationErrorMsg(RequiredCourseErrorText, FirstColumn);
+        }
+    }else{
+        if(document.getElementById('validation-error')){
+            document.getElementById('validation-error').remove();
+        }
+        RequiredCourseValidator = true;
+    }
+}
+
+if ((all_courses.length == 0 && RequiredCourseValidator === true) || (all_courses.length>0 && UniqueCourseValidator === true && RequiredCourseValidator === true)){
+//FAQicon
+const FAQimg = document.createElement('img');
+    FAQimg.id = 'first-column-FAQ-two';
+    FAQimg.className = 'faq rounded-circle';
+    FAQimg.src = 'images/FAQicon.png';
+    FAQimg.title = `Digita el valor porcentual de\ncada evaluación tomada sin\nel símbolo de porcentaje (%)`;
+    FirstColumn.appendChild(FAQimg);
+
+//Desactivando los input momentaneamente
 document.getElementById("new-course-name").disabled = true;
 document.getElementById("new-course-button").disabled = true;
 document.getElementById('number-of-exams').disabled = true;
-
-document.getElementById("new-course-name").value = '';
-document.getElementById('number-of-exams').value = '1';
 
 //Ingresando en un array cada evaluación
 let examsarray = [];
@@ -84,13 +139,11 @@ for (let i = 1; i <= NumberOfExams; i++) {
 
 //Creando un input por cada evaluación para luego determinar su valor
 examsarray.forEach(function (ExamValue) {
-
     const ntp = document.createElement("input");
     ntp.type = 'number';
     ntp.placeholder = `Ingrese el valor de la ${ExamValue}`;
     ntp.id = ((`${ExamValue}-of-${CourseName}`.replace(/°/g, "")).replace(/ /g, "")).toLocaleLowerCase();
     ntp.className = `form-control percentages-to-set-${CourseName}`;
-    ntp.style = 'margin-left:10px';
     FirstColumn.appendChild(ntp)
 })
 
@@ -99,8 +152,7 @@ const SetAndHide = document.createElement("input");
 SetAndHide.type = 'button';
 SetAndHide.value = 'Establecer porcentajes';
 SetAndHide.id = `set-and-hide-${CourseName}`;
-SetAndHide.className = 'btn btn-dark';
-SetAndHide.style = 'margin-left:10px';
+SetAndHide.className = 'btn btn-dark first-column-button percentages';
 FirstColumn.appendChild(SetAndHide);
 
 //Función tras activar el botón de almacenar datos
@@ -151,6 +203,13 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
     }
 
     if (PercentagesValidator === true){
+    //Restableciendo valores
+    document.getElementById("new-course-name").value = '';
+    document.getElementById('number-of-exams').value = '1';
+
+    //Eliminando el FAQ de porcentajes
+    document.getElementById('first-column-FAQ-two').remove();
+
     //Desapareciendo los input y el botón tras guardar data
     const percentages = document.getElementsByClassName(`percentages-to-set-${CourseName}`);
     for (let i of percentages) {
@@ -224,7 +283,6 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             (document.getElementById(((`${evaluation}-of-${CourseName}-input-li`.replace(/°/g, "")).replace(/ /g, "")).toLocaleLowerCase())).appendChild(text_input);
         }
         )
-
             //Botón para enviar data
             const SendAndShow = document.createElement('button');
             SendAndShow.textContent = 'Calcular';
@@ -312,7 +370,7 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
             all_courses.push(theCourseName);
             all_grades.push(theCourseFinalGrade);
 
-            //Llamando a DisplayChartF (Ln 54)
+            //Llamando a DisplayChartF (Ln 56)
             DisplayChartF();
 
             //Almacenamiento local
@@ -456,16 +514,18 @@ document.getElementById(`set-and-hide-${CourseName}`).onclick = function() {
 }   
 }
 }
+}
 
 //Carga el DOM
 window.addEventListener('DOMContentLoaded',() => {
     //Si hay data en localStorage...
     if(localStorage.length>0){
+        //Deshabilita inputs
         document.getElementById("new-course-button").disabled = true;
         document.getElementById("new-course-name").disabled = true;
         document.getElementById('number-of-exams').disabled = true;
 
-        //Activa un toast
+        //Activa el toast en index.html Ln 33
         const ToastAlert = document.getElementById('graph-alert');
         ToastAlert.style.display = 'block';
         $(document).ready(function(){
@@ -563,5 +623,4 @@ window.addEventListener('DOMContentLoaded',() => {
 }
 )
 
-document.addEventListener('DOMContentLoaded', init)
-
+document.addEventListener('DOMContentLoaded', init);
